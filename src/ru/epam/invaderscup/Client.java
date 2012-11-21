@@ -63,8 +63,7 @@ public class Client {
 		conn = new Socket(address, port);
 		out = new BufferedOutputStream(conn.getOutputStream());
 		
-		xml.sendData(out, false);
-		
+		xml.sendData(out, true);
 		
 	}
 	
