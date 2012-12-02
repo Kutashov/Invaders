@@ -41,7 +41,13 @@ public class Galaxy {
 		}
 		
 		List<String> visit_list = new ArrayList<String>();
-		visit_list.add(header);
+		
+		
+		for (Planet planet : planets.values()) {
+			if (planet.getNeighbours().size() == 1 && planet.getOwner().equals(client.getMyName())) {
+				visit_list.add(planet.getId());
+			}
+		}
 		
 		boolean wasneighbour = true;
 		int begin = 0;
@@ -63,7 +69,11 @@ public class Galaxy {
 			end = visit_list.size();
 		}
 		
-		
+		for (Planet planet : planets.values()) {
+			if (planet.getOwner().equals(client.getMyName()) && !visit_list.contains(planet.getId())) {
+				visit_list.add(planet.getId());
+			}
+		}
 		
 		boolean transfer;
 		
@@ -81,13 +91,17 @@ public class Galaxy {
 							actions.add(actionToString(key, id, diff));
 							transfer = true;
 							break;
-						}	
+						} else {
+							if (curplanet.expectedInAMove() > curplanet.getTransferMinimum()) {
+								actions.add(actionToString(key, id, 1));
+							}
+						}
 				}
 			}
 			
 			if (!transfer) {
 				int diff = curplanet.getMyPotential();
-				if (diff > 0){
+				if (diff > 0) {
 					List<String> min = new ArrayList<String>();
 					for (String id : curplanet.getNeighbours()) {
 						
@@ -106,12 +120,28 @@ public class Galaxy {
 							}
 						}
 					}
-					for (String id : min) {
-					   	actions.add(actionToString(key, id, diff/min.size()));
-					   	transfer = true;
+					if (min.size() == 1) {
+						if (curplanet.getType().compareTo(planets.get(min.get(0)).getType()) < 0) {
+							int res = Math.min(curplanet.getRemainedDroids() - curplanet.getMinimum(), 
+									planets.get(min.get(0)).getTransferMinimum() - planets.get(min.get(0)).expectedDroidsNum());
+							actions.add(actionToString(key, min.get(0), res));
+							transfer = true;
+						} else {
+							actions.add(actionToString(key, min.get(0), diff));
+						   	transfer = true;
+						}
+					} else {
+						if (min.size() != 0) {
+							diff /= min.size();
+							for (String id : min) {
+							   	actions.add(actionToString(key, id, diff));
+							   	transfer = true;
+							}
+						}
 					}
+					
 					   	
-				}	   	
+				}
 					 
 			}
 			
@@ -132,6 +162,30 @@ public class Galaxy {
 						}
 					}
 				}	
+			}
+			
+			if (curplanet.getMyPotential() > 0) {
+				int max = 0;
+				for (String id : curplanet.getNeighbours()) {
+					if (planets.get(id).getNeighbours().size() > max &&
+							planets.get(id).getOwner().equals(client.getMyName())) {
+						max = planets.get(id).getNeighbours().size();
+					}
+				}
+				List<String> maxlist = new ArrayList<String>();
+				for (String id : curplanet.getNeighbours()) {
+					if (planets.get(id).getNeighbours().size() == max &&
+							planets.get(id).getOwner().equals(client.getMyName())) {
+						maxlist.add(id);
+					}
+				}
+				if (maxlist.size() != 0) {
+					int diff = curplanet.getMyPotential()/maxlist.size();
+					for (String id : maxlist) {
+						actions.add(actionToString(key, id, diff));
+					}
+				}
+
 			}
 		}
 		

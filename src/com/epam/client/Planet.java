@@ -167,6 +167,34 @@ public class Planet {
 		return droids_num + income - outcome;
 	}
 	
+	protected Integer expectedInAMove () {
+		
+			int res = droids_num + income - outcome;
+			if (type.equals("TYPE_A")) {
+				res *= REGEN_TYPE_A;
+				if (res > MAX_TYPE_A) {
+					res = MAX_TYPE_A;
+				}
+			} else if (type.equals("TYPE_B")) {
+				res *= REGEN_TYPE_B;
+				if (res > MAX_TYPE_B) {
+					res = MAX_TYPE_B;
+				}
+			} else if (type.equals("TYPE_C")) {
+				res *= REGEN_TYPE_C;
+				if (res > MAX_TYPE_C) {
+					res = MAX_TYPE_C;
+				}
+			} else {
+				res *= REGEN_TYPE_D;
+				if (res > MAX_TYPE_D) {
+					res = MAX_TYPE_D;
+				}
+			}
+			return res;
+		
+	}
+	
 }
 
 

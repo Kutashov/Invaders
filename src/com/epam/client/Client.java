@@ -26,7 +26,7 @@ public class Client {
 	protected Galaxy galaxy;
 	private BufferedOutputStream out;
 	private BufferedReader in;
-	//private int num = 0;
+//	private int num = 0;
 	
 	
 	Client () {
